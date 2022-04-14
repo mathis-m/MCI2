@@ -23,6 +23,7 @@ export class BumperInteractionBehavior extends ComponentBase {
             .on('rotate', (rotate) => {
                 if(!this.isEnabled)
                     return
+
                 this.target.angle += rotate.angle;
             })
             .on('drag1', (rotate) => {

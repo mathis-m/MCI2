@@ -2,6 +2,7 @@ import {EventEmitter} from "../event-emitter/event-emitter";
 
 export class FSM {
     constructor(config) {
+        this.enable = true;
         // Attach get-next-state function
         const states = config.states;
         if (states) {
@@ -20,6 +21,9 @@ export class FSM {
 
         this._stateLock = false;
         this.emitter = new EventEmitter();
+        this.start(undefined);
+        if(config.init)
+            config.init.call(this);
     }
 
     shutdown() {
