@@ -38,13 +38,15 @@ const defaultState = {
     roundCount: 0,
     isStarted: false,
     currentLevel: level1,
-    selectedBumperIndex: undefined
+    selectedBumperIndex: undefined,
+    debug: true,
 }
 
 const defaultBallMovement = {
     bounce: 0.5,
     friction: 0.000005,
     airFriction: 0.005,
+    maxVelocity: 30
 }
 
 export class GameScene extends Phaser.Scene
@@ -77,6 +79,9 @@ export class GameScene extends Phaser.Scene
         this.matter.world.setBounds(0, 0, WorldWidth, WorldHeight);
         this.createDropLocationMarker();
         this.createActionGrid();
+        if(this.state.debug) {
+            this.createDebugInfo();
+        }
         this.createObstacles();
 
         const bumper = this.setupNewBumper();
@@ -289,6 +294,104 @@ export class GameScene extends Phaser.Scene
             }
             this.startButton.setText("Restart");
         }
+
+        if(this.ball) {
+            this.ensureMaxVelocityOfBall();
+            if(this.state.debug) {
+                this.logBallVelocity(this.ball.body.velocity)
+            }
+        }
     }
 
+    ensureMaxVelocityOfBall() {
+        let cappedXVelocity;
+        let needsAdjustment = false;
+
+        if (this.ball.body.velocity.x > this.ballMovement.maxVelocity) {
+            cappedXVelocity = this.ballMovement.maxVelocity;
+            needsAdjustment = true;
+        } else if (this.ball.body.velocity.x < -this.ballMovement.maxVelocity) {
+            cappedXVelocity = -this.ballMovement.maxVelocity;
+            needsAdjustment = true;
+        } else {
+            cappedXVelocity = this.ball.body.velocity.x;
+        }
+
+        let cappedYVelocity;
+        if (this.ball.body.velocity.y > this.ballMovement.maxVelocity) {
+            cappedYVelocity = this.ballMovement.maxVelocity;
+            needsAdjustment = true;
+        } else if (this.ball.body.velocity.y < -this.ballMovement.maxVelocity) {
+            cappedYVelocity = -this.ballMovement.maxVelocity;
+            needsAdjustment = true;
+        } else {
+            cappedYVelocity = this.ball.body.velocity.y;
+        }
+        if (needsAdjustment) {
+            if(Number.isNaN(cappedXVelocity) || Number.isNaN(cappedYVelocity)) {
+                debugger;
+            }
+            this.ball.setVelocity(cappedXVelocity, cappedYVelocity)
+        }
+    }
+
+    logBallVelocity (velocity) {
+        const round = (num) => Math.round((num + Number.EPSILON) * 100) / 100
+        const x = round(velocity.x);
+        const y = round(velocity.y);
+
+        if(this.maxVelosityX === undefined || this.maxVelosityX < Math.abs(x)) {
+            this.maxVelosityX = Math.abs(x);
+        }
+        if(this.maxVelosityY === undefined || this.maxVelosityY < Math.abs(y)) {
+            this.maxVelosityY = Math.abs(y);
+        }
+        this.ballVelocityXInfo.setText("Velocity X: " + x);
+        this.ballVelocityYInfo.setText("Velocity Y: " + y);
+        this.ballVelocityMaxInfo.setText("Max X: " + this.maxVelosityX + " Y: " + this.maxVelosityY);
+
+    }
+    createDebugInfo() {
+        this.ballVelocityXInfo = this.add
+            .text(
+                WorldWidth - 10,
+                10,
+                '',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '15px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(1, 0)
+            .setDepth(100)
+
+        this.ballVelocityYInfo = this.add
+            .text(
+                WorldWidth - 10,
+                this.ballVelocityXInfo.y + this.ballVelocityXInfo.height + 10,
+                '',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '15px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(1, 0)
+            .setDepth(100)
+
+        this.ballVelocityMaxInfo = this.add
+            .text(
+                WorldWidth - 10,
+                this.ballVelocityYInfo.y + this.ballVelocityYInfo.height + 10,
+                '',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '15px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(1, 0)
+            .setDepth(100)
+    }
 }

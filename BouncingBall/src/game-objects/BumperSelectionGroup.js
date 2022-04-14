@@ -22,7 +22,7 @@ export class BumperSelectionGroup {
     removeBumperAt(index) {
         const newBumpers = [...this.bumpers];
         const deleted = newBumpers.splice(index, 1)[0]
-        deleted.bumper.off('pointerup', deleted.onFn);
+        deleted.bumper.off('pointerdown', deleted.onFn);
         deleted.bumper.destroy();
         deleted.bumperBehavior.destroy();
 
@@ -30,7 +30,7 @@ export class BumperSelectionGroup {
         this.selectedIndex = undefined;
 
         for (let i = 0; i < newBumpers.length; i++) {
-            newBumpers[i].bumper.off('pointerup', newBumpers[i].onFn)
+            newBumpers[i].bumper.off('pointerdown', newBumpers[i].onFn)
             this.trackBumper(newBumpers[i].bumper, newBumpers[i].bumperBehavior, false);
         }
     }
@@ -42,10 +42,13 @@ export class BumperSelectionGroup {
             if(!this._selectEnabled)
                 return;
             if (this.selectedIndex === i) {
-                bumper.setStrokeStyle(0, 0);
+                // petter ux when it stays selected
+                // enables to drag on a selected
+
+                /*bumper.setStrokeStyle(0, 0);
                 this.selectedIndex = undefined;
                 bumperBehavior.toggleEnable();
-                this.onSelect(undefined)
+                this.onSelect(undefined)*/
             } else if (this.selectedIndex === undefined) {
                 this.selectedIndex = i;
                 bumper.setStrokeStyle(4, 0xFFFFFF);
@@ -71,7 +74,7 @@ export class BumperSelectionGroup {
         const bumperBehavior = bumperAndBehavior.bumperBehavior;
         const onFn = bumperAndBehavior.onFn;
         bumper.setInteractive();
-        bumper.on('pointerup', onFn)
+        bumper.on('pointerdown', onFn)
         if(selectNewest) {
             if (this.selectedIndex !== undefined) {
                 const {selectedBehavior, selectedBumper} = this.getSelectedBumper();
@@ -112,6 +115,8 @@ export class BumperSelectionGroup {
 
         this._selectEnabled = enabled;
         if(!enabled) {
+            if (this.selectedIndex === undefined)
+                return;
             const {selectedBehavior, selectedBumper, onFn} = this.getSelectedBumper();
             selectedBehavior.toggleEnable()
             selectedBumper.setStrokeStyle(0, 0);

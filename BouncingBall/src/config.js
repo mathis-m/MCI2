@@ -22,10 +22,13 @@ export const config = {
         height: WorldHeight,
     },
     scene: scene,
+    debug: true,
     physics: {
         default: 'matter',
         matter: {
-            enableSleeping: true,
+            positionIterations: 20,
+            velocityIterations: 20,
+            constraintIterations: 20,
             gravity: {
                 y: 2
             },

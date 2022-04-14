@@ -36,14 +36,14 @@ export class BumperInteractionBehavior extends ComponentBase {
     }
 
     setupPinchGesture() {
-        this.scalable.emitter
+        /*this.scalable.emitter
             .on('pinch', (pinch) => {
                 if(!this.isEnabled)
                     return
                 const scaleFactor = pinch.scaleFactor;
                 //this.target.scaleX *= scaleFactor;
                 //this.target.setSize(this.target.width, this.target.height)
-            })
+            })*/
     }
 
     toggleEnable() {
