@@ -37,7 +37,8 @@ const defaultState = {
     roundState: RoundState.Idle,
     roundCount: 0,
     isStarted: false,
-    currentLevel: level1
+    currentLevel: level1,
+    selectedBumperIndex: undefined
 }
 
 const defaultBallMovement = {
@@ -81,9 +82,14 @@ export class GameScene extends Phaser.Scene
         const bumper = this.setupNewBumper();
         this.bumperGroup = new BumperSelectionGroup([
             bumper
-        ], this);
+        ], this, (i) => this.onBumperSelected(i));
 
         this.createRim();
+    }
+
+    onBumperSelected (index) {
+        this.state.selectedBumperIndex = index;
+        this.removeBumperButton.setVisible(index !== undefined)
     }
 
     createRim() {
@@ -143,7 +149,10 @@ export class GameScene extends Phaser.Scene
                     this.startButton.setText("Start");
                     this.addBumperButton.setVisible(true);
                     this.addDamperButton.setVisible(true);
+                    this.removeBumperButton.setVisible(true);
                 }
+                this.bumperGroup.setSelectEnabled(!this.state.isStarted);
+
             });
 
         this.resetButton = this.add
@@ -170,7 +179,7 @@ export class GameScene extends Phaser.Scene
                 this.addDamperButton.setVisible(true);
                 this.bumperIntitialAngle = 0;
                 this.bumperGroup.destroy();
-                this.bumperGroup = new BumperSelectionGroup([this.setupNewBumper()], this)
+                this.bumperGroup = new BumperSelectionGroup([this.setupNewBumper()], this, (i) => this.onBumperSelected(i))
             });
 
         this.addBumperButton = this.add
@@ -211,6 +220,28 @@ export class GameScene extends Phaser.Scene
                 if(this.state.isStarted)
                     return;
                 this.bumperGroup.addBumper(this.setupNewBumper(-1, 0xE7C800))
+            });
+
+        this.removeBumperButton = this.add
+            .text(
+                this.addDamperButton.x - this.addDamperButton.width - 30,
+                WorldHeight - 10,
+                'Remove',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '20px',
+                    fill: '#fff',
+                }
+            )
+            .setVisible(false)
+            .setOrigin(1)
+            .setDepth(100)
+            .setInteractive()
+            .on('pointerdown', () => {
+                if(this.state.isStarted)
+                    return;
+                if(this.state.selectedBumperIndex !== undefined)
+                    this.bumperGroup.removeBumperAt(this.state.selectedBumperIndex)
             });
     }
 
@@ -254,6 +285,7 @@ export class GameScene extends Phaser.Scene
             if(this.addBumperButton) {
                 this.addBumperButton.setVisible(false);
                 this.addDamperButton.setVisible(false);
+                this.removeBumperButton.setVisible(false);
             }
             this.startButton.setText("Restart");
         }
