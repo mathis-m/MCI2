@@ -142,6 +142,7 @@ export class GameScene extends Phaser.Scene
                     this.ball = undefined;
                     this.startButton.setText("Start");
                     this.addBumperButton.setVisible(true);
+                    this.addDamperButton.setVisible(true);
                 }
             });
 

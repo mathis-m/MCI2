@@ -9,7 +9,10 @@ export const config = {
     width: WorldWidth,
     height: WorldHeight,
     scale: {
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: WorldWidth,
+        height: WorldHeight,
     },
     scene: GameScene,//[IntroScene, GameScene],
     physics: {
