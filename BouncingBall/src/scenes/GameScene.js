@@ -3,7 +3,7 @@ import {BouncingBallLevel, InitialBallVelocity} from "../levels/Level";
 import ballImg from '../assets/ball.png';
 import dropLocationArrow from '../assets/drop-location-arrow.svg';
 import {WorldHeight, WorldWidth} from "../world";
-import {BumperSelectionGroup} from "../game-objects/BumperInteractionBehavior";
+import {BumperSelectionGroup} from "../game-objects/BumperSelectionGroup";
 
 const RoundState = {
     Idle: 'idle',
@@ -26,6 +26,10 @@ const level1 = new BouncingBallLevel(
             scene.matter.add.gameObject(simpleWall)
                 .setStatic(true)
         ];
+    },
+    {
+        rimLocationX: WorldWidth * 0.8,
+        rimLocationY: WorldHeight * 0.8,
     }
 )
 
@@ -78,14 +82,38 @@ export class GameScene extends Phaser.Scene
         this.bumperGroup = new BumperSelectionGroup([
             bumper
         ]);
+
+        this.createRim();
     }
 
-    setupNewBumper() {
-        let bumper = this.add.rectangle(WorldWidth / 2, WorldHeight / 3, 150, 10, 0xFF0E0C)
+    createRim() {
+        const x = this.state.currentLevel.rimLocationX;
+        const y = this.state.currentLevel.rimLocationY;
+        const leftBorder = this.matter.add.gameObject(this.add.rectangle(x - 40, y, 10, 80, 0x3886A3))
+            .setStatic(true)
+            .setBounce(-5)
+        const rightBorder = this.matter.add.gameObject(this.add.rectangle(x + 40, y, 10, 80, 0x3886A3))
+            .setStatic(true)
+            .setBounce(-5)
+        const bottomBorder = this.matter.add.gameObject(this.add.rectangle(x, y + 35, 70, 10, 0x3886A3))
+            .setStatic(true)
+            .setBounce(-5)
+        this.rim = this.add.group([
+            leftBorder,
+            rightBorder,
+            bottomBorder
+        ])
+        this.rim = this.matter.add.gameObject(this.rim)
+        this.rim.setBounce(-5);
+        this.rim.setStatic(true);
+    }
+
+    setupNewBumper(bounceFactor = 2.5, color = 0x3EE756) {
+        let bumper = this.add.rectangle(WorldWidth / 2, WorldHeight / 3, 150, 10, color)
         bumper = this.matter.add.gameObject(bumper)
         bumper.setStatic(true);
         bumper.setAngle(this.bumperIntitialAngle);
-        bumper.setBounce(2.5);
+        bumper.setBounce(bounceFactor);
         this.bumperIntitialAngle += 15;
         return bumper;
     }
@@ -138,6 +166,7 @@ export class GameScene extends Phaser.Scene
                 this.ball = undefined;
                 this.startButton.setText("Start");
                 this.addBumperButton.setVisible(true);
+                this.addDamperButton.setVisible(true);
                 this.bumperIntitialAngle = 0;
                 this.bumperGroup.destroy();
                 this.bumperGroup = new BumperSelectionGroup([this.setupNewBumper()])
@@ -145,7 +174,7 @@ export class GameScene extends Phaser.Scene
 
         this.addBumperButton = this.add
             .text(
-                WorldWidth - this.startButton.width - 30,
+                this.startButton.x - this.startButton.width - 30,
                 WorldHeight - 10,
                 'Add Bumper',
                 {
@@ -161,6 +190,26 @@ export class GameScene extends Phaser.Scene
                 if(this.state.isStarted)
                     return;
                 this.bumperGroup.addBumper(this.setupNewBumper())
+            });
+        console.log(this.addBumperButton)
+        this.addDamperButton = this.add
+            .text(
+                this.addBumperButton.x - this.addBumperButton.width - 30,
+                WorldHeight - 10,
+                'Add Damper',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '20px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(1)
+            .setDepth(100)
+            .setInteractive()
+            .on('pointerdown', () => {
+                if(this.state.isStarted)
+                    return;
+                this.bumperGroup.addBumper(this.setupNewBumper(-1, 0xE7C800))
             });
     }
 
@@ -203,6 +252,7 @@ export class GameScene extends Phaser.Scene
             this.createBall();
             if(this.addBumperButton) {
                 this.addBumperButton.setVisible(false);
+                this.addDamperButton.setVisible(false);
             }
             this.startButton.setText("Restart");
         }

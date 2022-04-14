@@ -7,15 +7,21 @@ export const InitialBallVelocity = {
 }
 
 export class BouncingBallLevel {
-    constructor({ballDropLocationX, ballDropLocationY, initialBallVelocity}, createObstaclesForScene) {
+    constructor({ballDropLocationX, ballDropLocationY, initialBallVelocity}, createObstaclesForScene, {rimLocationX, rimLocationY}) {
         this.ballDropLocationX = ballDropLocationX;
         this.ballDropLocationY = ballDropLocationY;
         this.initialBallVelocity = initialBallVelocity;
         this.createObstaclesForSceneFn = createObstaclesForScene;
+        this.rimLocationX = rimLocationX;
+        this.rimLocationY = rimLocationY;
     }
 
     createObstaclesForScene(scene) {
         return this.createObstaclesForSceneFn(scene);
+    }
+
+    createRimForScene() {
+
     }
 
     preload(scene) {

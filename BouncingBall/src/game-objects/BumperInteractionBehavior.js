@@ -1,6 +1,5 @@
 import {ComponentBase} from "./ComponentBase";
 import {RotateGesture} from "../gestures/RotateGesture";
-import {PinchGesture} from "../gestures/Scalable";
 
 export class BumperInteractionBehavior extends ComponentBase {
     constructor(bumperGameObject) {
@@ -60,64 +59,3 @@ export class BumperInteractionBehavior extends ComponentBase {
     }
 }
 
-export class BumperSelectionGroup {
-    constructor(bumpers) {
-        this.bumpers = [];
-        this.selectedIndex = undefined;
-        for (let i = 0; i < bumpers.length; i++) {
-            const bumper = bumpers[i];
-            const bumperBehavior = new BumperInteractionBehavior(bumper);
-            this.bumpers.push({bumper, bumperBehavior})
-            this.setupSelection({bumper, bumperBehavior}, i);
-        }
-    }
-
-    addBumper(bumper) {
-        const bumperBehavior = new BumperInteractionBehavior(bumper);
-        const newLength = this.bumpers.push({bumper, bumperBehavior})
-        this.setupSelection({bumper, bumperBehavior}, newLength - 1);
-    }
-
-    setupSelection(bumperAndBehavior, i) {
-        const bumper = bumperAndBehavior.bumper;
-        const bumperBehavior = bumperAndBehavior.bumperBehavior;
-        bumper.setInteractive();
-        bumper.on('pointerup', () => {
-            if (this.selectedIndex === i) {
-                bumper.fillColor = 0xFF0E0C;
-                this.selectedIndex = undefined;
-                bumperBehavior.toggleEnable();
-            } else if (this.selectedIndex === undefined) {
-                bumper.fillColor = 0x52FF45;
-                this.selectedIndex = i;
-                bumperBehavior.toggleEnable();
-            } else {
-                const {bumper: selectedBumper, bumperBehavior: selectedBehavior} = this.bumpers[this.selectedIndex];
-                selectedBumper.fillColor = 0xFF0E0C;
-                selectedBehavior.toggleEnable()
-
-                bumper.fillColor = 0x52FF45;
-                this.selectedIndex = i;
-                bumperBehavior.toggleEnable();
-            }
-        })
-        if(this.selectedIndex !== undefined) {
-            const {bumper: selectedBumper, bumperBehavior: selectedBehavior} = this.bumpers[this.selectedIndex];
-            selectedBumper.fillColor = 0xFF0E0C;
-            selectedBehavior.toggleEnable()
-        }
-        bumper.fillColor = 0x52FF45;
-        this.selectedIndex = i;
-        this.selectedBumper = bumperAndBehavior;
-        bumperBehavior.toggleEnable();
-    }
-
-    destroy() {
-        this.bumpers.forEach(b => {
-            b.bumper.destroy();
-            b.bumperBehavior.destroy();
-        });
-        this.bumpers.length = 0;
-        this.selectedIndex = undefined;
-    }
-}
