@@ -3,7 +3,7 @@ import {BouncingBallLevel, InitialBallVelocity} from "../levels/Level";
 import ballImg from '../assets/ball.png';
 import dropLocationArrow from '../assets/drop-location-arrow.svg';
 import {WorldHeight, WorldWidth} from "../world";
-import {Bumper} from "../game-objects/Bumper";
+import {BumperContainer, BumperInteractionBehavior} from "../game-objects/BumperInteractionBehavior";
 
 const RoundState = {
     Idle: 'idle',
@@ -58,14 +58,14 @@ export class GameScene extends Phaser.Scene
         };
     }
 
-    preload ()
+    preload()
     {
         this.load.image('ball', ballImg);
         this.load.svg('drop-arrow', dropLocationArrow);
         this.state.currentLevel.preload(this);
     }
 
-    create ()
+    create()
     {
         this.matter.world.setBounds(0, 0, WorldWidth, WorldHeight);
         this.createBall();
@@ -75,8 +75,10 @@ export class GameScene extends Phaser.Scene
         bumper = this.matter.add.gameObject(bumper)
         bumper.setStatic(true);
         bumper.setAngle(45);
-        bumper.setBounce(2)
-        new Bumper(bumper);
+        bumper.setBounce(2);
+        new BumperContainer([
+            bumper
+        ]);
     }
 
     createBall() {

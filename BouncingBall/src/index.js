@@ -18,10 +18,6 @@ const config = {
             enableSleeping: true,
             gravity: {
                 y: 2
-            },
-            debug: {
-                showBody: true,
-                showStaticBody: true
             }
         }
     },

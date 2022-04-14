@@ -29,11 +29,9 @@ export class TwoPointersTracer {
     }
 
     boot() {
-        debugger
-        const handler = this.targetIsScene ? this.target.input : this.target
-        handler.on('pointerdown', this.onPointerDown, this);
-        handler.on('pointerup', this.onPointerUp, this);
-        handler.on('pointermove', this.onPointerMove, this);
+        this.scene.input.on('pointerdown', this.onPointerDown, this);
+        this.scene.input.on('pointerup', this.onPointerUp, this);
+        this.scene.input.on('pointermove', this.onPointerMove, this);
         this.scene.sys.events.once('shutdown', this.destroy, this);
     }
 
@@ -89,7 +87,6 @@ export class TwoPointersTracer {
     }
 
     onPointerDown(pointer) {
-        debugger
         if (!this.enable) {
             return;
         }

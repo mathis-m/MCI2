@@ -45,7 +45,6 @@ export class Rotatable extends TwoPointersTracer {
     }
 
     onDrag2Start() {
-        debugger
         this.prevAngle = WrapDegrees(RadToDeg(this.angleBetween)); // Degrees
         this.state = BEGIN;
         if (this.dragThreshold === 0) {
