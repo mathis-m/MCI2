@@ -9,7 +9,7 @@ export class PinchGesture extends TwoPointersTracer {
         super(scene, config);
 
         this.emitter = new EventEmitter();
-        this.threshold = 0;
+        this.dragThreshold = 0;
         const self = this;
         const stateConfig = {
             states: {
@@ -79,4 +79,4 @@ export class PinchGesture extends TwoPointersTracer {
         this.dragThreshold = distance;
         return this;
     }
-x}
+}
