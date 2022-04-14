@@ -22,7 +22,6 @@ export const config = {
             gravity: {
                 y: 2
             },
-            debug: true
         }
     },
 };

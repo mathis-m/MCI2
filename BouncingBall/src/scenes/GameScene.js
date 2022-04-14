@@ -81,7 +81,7 @@ export class GameScene extends Phaser.Scene
         const bumper = this.setupNewBumper();
         this.bumperGroup = new BumperSelectionGroup([
             bumper
-        ]);
+        ], this);
 
         this.createRim();
     }
@@ -170,7 +170,7 @@ export class GameScene extends Phaser.Scene
                 this.addDamperButton.setVisible(true);
                 this.bumperIntitialAngle = 0;
                 this.bumperGroup.destroy();
-                this.bumperGroup = new BumperSelectionGroup([this.setupNewBumper()])
+                this.bumperGroup = new BumperSelectionGroup([this.setupNewBumper()], this)
             });
 
         this.addBumperButton = this.add
