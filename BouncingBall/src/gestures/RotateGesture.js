@@ -40,7 +40,7 @@ export class RotateGesture extends TwoPointersTracer {
             eventEmitter: false,
         };
         this.setRecognizedStateObject(new FSM(stateConfig));
-        this.setDragThreshold(0);
+        this.setDragThreshold(10);
     }
 
     onDrag2Start() {

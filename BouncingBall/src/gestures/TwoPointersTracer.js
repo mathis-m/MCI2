@@ -10,7 +10,6 @@ export class TwoPointersTracer {
     constructor(gameObjectOrScene) {
         this.emitter = new EventEmitter();
         this.target = gameObjectOrScene;
-        this.targetIsScene = isSceneObject(gameObjectOrScene);
 
         this.scene = getSceneObject(gameObjectOrScene);
 
@@ -82,6 +81,7 @@ export class TwoPointersTracer {
 
     toggleEnable() {
         this.setEnable(!this.enable);
+        this.emitter.setEnable(this.enable);
         return this;
     }
 
@@ -126,11 +126,13 @@ export class TwoPointersTracer {
 
         const isInsideBounds = this.bounds ? this.bounds.contains(WorldBounds, {x: pointer.x, y: pointer.y}) : true;
         if (!isInsideBounds) {
+            console.warn("not in bounds")
             return;
         }
 
         const index = this.pointers.indexOf(pointer);
         if (index === -1) { // Not in catched pointers
+            console.warn("did not catch the pointer on down")
             return;
         } else {
             delete this.movedState[pointer.id];

@@ -1,14 +1,21 @@
 export class EventEmitter {
     constructor() {
         this._events = {};
+        this._enable = true;
     }
 
     emit(eventName, event) {
+        if(!this._enable)
+            return;
         if (!this._events[eventName]) {
             return;
         }
 
         this._events[eventName].forEach(callback => callback(event));
+    }
+
+    setEnable(e) {
+        this._enable = e;
     }
 
     on(eventName, fn) {

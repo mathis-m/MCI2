@@ -62,7 +62,7 @@ export class GameScene extends Phaser.Scene
 
     preload()
     {
-        this.load.image('ball', ballImg);
+        // this.load.image('ball', ballImg);
         this.load.svg('drop-arrow', dropLocationArrow);
         this.state.currentLevel.preload(this);
     }
@@ -70,6 +70,7 @@ export class GameScene extends Phaser.Scene
     create()
     {
         this.matter.world.setBounds(0, 0, WorldWidth, WorldHeight);
+        this.createDropLocationMarker();
         this.createActionGrid();
         this.createObstacles();
 
@@ -84,7 +85,7 @@ export class GameScene extends Phaser.Scene
         bumper = this.matter.add.gameObject(bumper)
         bumper.setStatic(true);
         bumper.setAngle(this.bumperIntitialAngle);
-        bumper.setBounce(2);
+        bumper.setBounce(2.5);
         this.bumperIntitialAngle += 15;
         return bumper;
     }
@@ -165,8 +166,10 @@ export class GameScene extends Phaser.Scene
 
     createBall() {
         const ballOptions = this.getInitialBallOptions();
-        this.ball = this.matter.add.sprite(ballOptions.x, ballOptions.y, 'ball', null)
+        this.ball = this.add.circle(ballOptions.x, ballOptions.y, 16, 0xFFFFF)
+        this.ball = this.matter.add.gameObject(this.ball)
         this.ball.setBounce(this.ballMovement.bounce)
+        this.ball.setCircle(16)
         //this.ball.setFrictionAir(this.ballMovement.airFriction)
         //this.ball.setFriction(this.ballMovement.friction, this.ballMovement.friction, this.ballMovement.friction)
     }
@@ -183,7 +186,7 @@ export class GameScene extends Phaser.Scene
                 : 3;
 
         for (let i = 0; i < count; i++) {
-            const marker = this.physics.add.sprite(ballOptions.x + 16, ballOptions.y + currentOffset, 'drop-arrow');
+            const marker = this.add.sprite(ballOptions.x + 16, ballOptions.y + currentOffset, 'drop-arrow');
             this.dropLocationMarkers.push(marker)
             currentOffset += 16;
         }

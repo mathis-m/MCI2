@@ -4,7 +4,7 @@ import {WorldHeight, WorldWidth} from "./world";
 
 
 export const config = {
-    type: Phaser.CANVAS,
+    type: Phaser.AUTO,
     parent: 'bouncing-ball',
     width: WorldWidth,
     height: WorldHeight,
@@ -18,7 +18,8 @@ export const config = {
             enableSleeping: true,
             gravity: {
                 y: 2
-            }
+            },
+            debug: true
         }
     },
 };
