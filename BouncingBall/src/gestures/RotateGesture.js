@@ -11,10 +11,9 @@ const IDLE = 'IDLE';
 const BEGIN = 'BEGIN';
 const RECOGNIZED = 'RECOGNIZED';
 
-export class Rotatable extends TwoPointersTracer {
+export class RotateGesture extends TwoPointersTracer {
     constructor(gameObjectOrScene, config) {
         super(gameObjectOrScene, config);
-        this.tracer = new TwoPointersTracer(gameObjectOrScene);
 
         const self = this;
         const stateConfig = {

@@ -3,7 +3,7 @@ import {BouncingBallLevel, InitialBallVelocity} from "../levels/Level";
 import ballImg from '../assets/ball.png';
 import dropLocationArrow from '../assets/drop-location-arrow.svg';
 import {WorldHeight, WorldWidth} from "../world";
-import {BumperContainer, BumperInteractionBehavior} from "../game-objects/BumperInteractionBehavior";
+import {BumperSelectionGroup, BumperInteractionBehavior} from "../game-objects/BumperInteractionBehavior";
 
 const RoundState = {
     Idle: 'idle',
@@ -76,7 +76,7 @@ export class GameScene extends Phaser.Scene
         bumper.setStatic(true);
         bumper.setAngle(45);
         bumper.setBounce(2);
-        new BumperContainer([
+        new BumperSelectionGroup([
             bumper
         ]);
     }

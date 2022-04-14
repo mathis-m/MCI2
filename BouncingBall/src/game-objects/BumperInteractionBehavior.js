@@ -1,5 +1,6 @@
 import {ComponentBase} from "./ComponentBase";
-import {Rotatable} from "../gestures/Rotatable";
+import {RotateGesture} from "../gestures/RotateGesture";
+import {PinchGesture} from "../gestures/Scalable";
 
 export class BumperInteractionBehavior extends ComponentBase {
     constructor(bumperGameObject) {
@@ -7,9 +8,14 @@ export class BumperInteractionBehavior extends ComponentBase {
 
         this.isEnabled = false;
         this.target = bumperGameObject;
-        this.rotatable = new Rotatable(bumperGameObject)
+
+        this.rotatable = new RotateGesture(bumperGameObject)
         this.rotatable.enable = false;
         this.setupRotationGesture();
+
+        this.scalable = new PinchGesture(bumperGameObject)
+        this.scalable.enable = false;
+        this.setupPinchGesture();
     }
 
     setupRotationGesture() {
@@ -29,13 +35,23 @@ export class BumperInteractionBehavior extends ComponentBase {
             })
     }
 
+    setupPinchGesture() {
+        this.scalable.emitter
+            .on('pinch', (pinch) => {
+                if(!this.isEnabled)
+                    return
+                const scaleFactor = pinch.scaleFactor;
+                this.target.width *= scaleFactor;
+            })
+    }
+
     toggleEnable() {
         this.isEnabled = !this.isEnabled;
         this.rotatable.toggleEnable();
     }
 }
 
-export class BumperContainer {
+export class BumperSelectionGroup {
     constructor(bumpers) {
         this.bumpers = [];
         this.selectedIndex = undefined;
