@@ -42,13 +42,14 @@ export class BumperInteractionBehavior extends ComponentBase {
                 if(!this.isEnabled)
                     return
                 const scaleFactor = pinch.scaleFactor;
-                this.target.width *= scaleFactor;
+                this.target.scaleX *= scaleFactor;
             })
     }
 
     toggleEnable() {
         this.isEnabled = !this.isEnabled;
         this.rotatable.toggleEnable();
+        this.scalable.toggleEnable();
     }
 }
 
@@ -68,7 +69,7 @@ export class BumperSelectionGroup {
         const bumper = bumperAndBehavior.bumper;
         const bumperBehavior = bumperAndBehavior.bumperBehavior;
         bumper.setInteractive();
-        bumper.on('pointerdown', () => {
+        bumper.on('pointerup', () => {
             if (this.selectedIndex === i) {
                 bumper.fillColor = 0xFF0E0C;
                 this.selectedIndex = undefined;

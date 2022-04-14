@@ -19,7 +19,7 @@ export class TwoPointersTracer {
             this.scene.input.addPointer(2 - amount);
         }
 
-        this._enable = true;
+        this._enable = false;
         this.bounds = this.scene.matter.bounds;
         this.tracerState = TOUCH0;
 

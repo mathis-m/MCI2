@@ -9,7 +9,6 @@ export class PinchGesture extends TwoPointersTracer {
         super(scene, config);
 
         this.emitter = new EventEmitter();
-        this.dragThreshold = 0;
         const self = this;
         const stateConfig = {
             states: {
@@ -35,6 +34,7 @@ export class PinchGesture extends TwoPointersTracer {
             eventEmitter: false,
         };
         this.setRecognizedStateObject(new FSM(stateConfig));
+        this.setDragThreshold(0);
     }
 
     onDrag2Start() {
