@@ -1,8 +1,15 @@
 import Phaser from 'phaser';
 import {GameScene} from "./scenes/GameScene";
 import {WorldHeight, WorldWidth} from "./world";
+import {IntroScene} from "./scenes/IntroScene";
+console.log(`Running in '${!process.env.NODE_ENV ? 'production' : process.env.NODE_ENV}' mode`);
 
-
+let scene
+if (process.env.NODE_ENV === 'development') {
+    scene = GameScene;
+} else {
+    scene = [IntroScene, GameScene];
+}
 export const config = {
     type: Phaser.AUTO,
     parent: 'bouncing-ball',
@@ -14,7 +21,7 @@ export const config = {
         width: WorldWidth,
         height: WorldHeight,
     },
-    scene: GameScene,//[IntroScene, GameScene],
+    scene: scene,
     physics: {
         default: 'matter',
         matter: {
