@@ -51,6 +51,12 @@ export class BumperInteractionBehavior extends ComponentBase {
         this.rotatable.toggleEnable();
         this.scalable.toggleEnable();
     }
+
+    destroy() {
+        super.destroy();
+        this.rotatable.destroy();
+        this.scalable.destroy();
+    }
 }
 
 export class BumperSelectionGroup {
@@ -63,6 +69,12 @@ export class BumperSelectionGroup {
             this.bumpers.push({bumper, bumperBehavior})
             this.setupSelection({bumper, bumperBehavior}, i);
         }
+    }
+
+    addBumper(bumper) {
+        const bumperBehavior = new BumperInteractionBehavior(bumper);
+        const newLength = this.bumpers.push({bumper, bumperBehavior})
+        this.setupSelection({bumper, bumperBehavior}, newLength - 1);
     }
 
     setupSelection(bumperAndBehavior, i) {
@@ -88,5 +100,14 @@ export class BumperSelectionGroup {
                 bumperBehavior.toggleEnable();
             }
         })
+    }
+
+    destroy() {
+        this.bumpers.forEach(b => {
+            b.bumper.destroy();
+            b.bumperBehavior.destroy();
+        });
+        this.bumpers.length = 0;
+        this.selectedIndex = undefined;
     }
 }

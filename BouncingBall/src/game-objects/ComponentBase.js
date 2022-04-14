@@ -30,7 +30,7 @@ export class ComponentBase {
         }
     }
 
-    shutdown(fromScene) {
+    shutdown() {
         if (this.isShutdown) {
             return;
         }
@@ -47,8 +47,8 @@ export class ComponentBase {
         this.isShutdown = true;
     }
 
-    destroy(fromScene) {
-        this.shutdown(fromScene);
+    destroy() {
+        this.shutdown();
     }
 
     onSceneDestroy() {

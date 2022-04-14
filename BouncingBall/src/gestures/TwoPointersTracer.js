@@ -42,10 +42,9 @@ export class TwoPointersTracer {
 
         this.pointers.length = 0;
         this.movedState = {}
-        const handler = this.targetIsScene ? this.target.input : this.target
-        handler.input.off('pointerdown', this.onPointerDown, this);
-        handler.input.off('pointerup', this.onPointerUp, this);
-        handler.input.off('pointermove', this.onPointerMove, this);
+        this.scene.input.off('pointerdown', this.onPointerDown, this);
+        this.scene.input.off('pointerup', this.onPointerUp, this);
+        this.scene.input.off('pointermove', this.onPointerMove, this);
         this.scene.sys.events.off('shutdown', this.destroy, this);
         this.scene = undefined;
         this.target = undefined;
