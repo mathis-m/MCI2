@@ -8,7 +8,7 @@ console.log(`Running in '${!process.env.NODE_ENV ? 'production' : process.env.NO
 
 let scene
 if (process.env.NODE_ENV === 'development') {
-    scene = [GameScene, LevelRunFinishScene, LevelOverviewScene];
+    scene = [IntroScene, LevelOverviewScene, GameScene, LevelRunFinishScene];
 } else {
     scene = [IntroScene, GameScene, LevelRunFinishScene, LevelOverviewScene];
 }
@@ -24,7 +24,32 @@ export const config = {
         height: WorldHeight,
     },
     scene: scene,
-    debug: true,
+    debug: false,
+    physics: {
+        default: 'matter',
+        matter: {
+            positionIterations: 20,
+            velocityIterations: 20,
+            constraintIterations: 20,
+            gravity: {
+                y: 2
+            },
+        }
+    },
+};
+
+export const snapshotConfig = {
+    type: Phaser.CANVAS,
+    width: WorldWidth,
+    height: WorldHeight,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: WorldWidth,
+        height: WorldHeight,
+    },
+    scene: GameScene,
+    debug: false,
     physics: {
         default: 'matter',
         matter: {

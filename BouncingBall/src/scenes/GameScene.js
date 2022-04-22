@@ -14,17 +14,18 @@ const RoundState = {
     Setup: 'setup',
     Execute: 'execute',
     Over: 'over',
-    Win: 'win'
+    Win: 'win',
+    Snapshot: 'snapshot'
 }
 
 const defaultState = {
     roundState: RoundState.Setup,
-    roundCount: 0,
     isStarted: false,
     currentLevel: null,
     levelInfo: null,
     selectedBumperIndex: undefined,
     debug: false,
+    winState: null
 }
 
 const defaultBallMovement = {
@@ -37,9 +38,18 @@ const defaultBallMovement = {
 export class GameScene extends Phaser.Scene {
     constructor() {
         super('game');
+        this.isPreview = false;
     }
 
-    init(level) {
+    init({level, isPreview, destroyAfterSnapshot, afterSnapshot}) {
+        if (isPreview === undefined)
+            isPreview = false;
+        if (destroyAfterSnapshot === undefined)
+            destroyAfterSnapshot = false;
+
+        this.afterSnapshot = afterSnapshot
+        this.isPreview = isPreview;
+        this.destroyAfterSnapshot = destroyAfterSnapshot;
         this.ball = undefined;
         this.bumperIntitialAngle = 0;
         this.state = {...defaultState}
@@ -70,6 +80,8 @@ export class GameScene extends Phaser.Scene {
 
 
     create() {
+        this.hudGroup = this.add.group();
+
         this.matter.world.setBounds(0, 0, WorldWidth, WorldHeight);
         this.createDropLocationMarker();
         this.createActionGrid();
@@ -78,10 +90,10 @@ export class GameScene extends Phaser.Scene {
         }
         this.createObstacles();
 
-        const bumper = this.setupNewBumper();
-        this.bumperGroup = new BumperSelectionGroup([
-            bumper
-        ], this, (i) => this.onBumperSelected(i));
+        const bumpers = !this.isPreview
+            ? [this.setupNewBumper()]
+            : [];
+        this.bumperGroup = new BumperSelectionGroup(bumpers, this, (i) => this.onBumperSelected(i));
 
         this.createRim();
         setInterval(() => {
@@ -180,7 +192,7 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 if (!this.state.isStarted) {
@@ -192,6 +204,7 @@ export class GameScene extends Phaser.Scene {
                 this.bumperGroup.setSelectEnabled(!this.state.isStarted);
 
             });
+        this.hudGroup.add(this.startButton)
 
         this.resetButton = this.add
             .text(
@@ -205,11 +218,13 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(0, 1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 this.reset(true);
             });
+        this.hudGroup.add(this.resetButton)
+
 
         this.overView = this.add
             .text(
@@ -223,11 +238,12 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(0, 1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 this.scene.start("levelOverview");
             });
+        this.hudGroup.add(this.overView)
 
         this.addBumperButton = this.add
             .text(
@@ -241,13 +257,15 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 if (this.state.isStarted)
                     return;
                 this.bumperGroup.addBumper(this.setupNewBumper())
             });
+        this.hudGroup.add(this.addBumperButton)
+
         this.addDamperButton = this.add
             .text(
                 this.addBumperButton.x - this.addBumperButton.width - 30,
@@ -260,13 +278,14 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 if (this.state.isStarted)
                     return;
                 this.bumperGroup.addBumper(this.setupNewBumper(-1, 0xE7C800))
             });
+        this.hudGroup.add(this.addDamperButton)
 
         this.removeBumperButton = this.add
             .text(
@@ -281,7 +300,7 @@ export class GameScene extends Phaser.Scene {
             )
             .setVisible(false)
             .setOrigin(1)
-            .setDepth(100)
+            .setDepth(200)
             .setInteractive()
             .on('pointerdown', () => {
                 if (this.state.isStarted)
@@ -289,6 +308,8 @@ export class GameScene extends Phaser.Scene {
                 if (this.state.selectedBumperIndex !== undefined)
                     this.bumperGroup.removeBumperAt(this.state.selectedBumperIndex)
             });
+        this.hudGroup.add(this.removeBumperButton)
+
     }
 
     createBall() {
@@ -299,7 +320,7 @@ export class GameScene extends Phaser.Scene {
         this.ball.setBounce(this.ballMovement.bounce)
         this.ball.setCircle(16)
         this.ball.setOrigin(.5)
-        this.trail = new Trail(this, this.ball.centerX,this.ball.centerY, '')
+        this.trail = new Trail(this, this.ball.centerX, this.ball.centerY, '')
         //this.ball.setFrictionAir(this.ballMovement.airFriction)
         //this.ball.setFriction(this.ballMovement.friction, this.ballMovement.friction, this.ballMovement.friction)
     }
@@ -354,6 +375,9 @@ export class GameScene extends Phaser.Scene {
 
     update(time, delta) {
         super.update(time, delta);
+
+        this.hudGroup.setVisible(!this.isPreview);
+
         if (this.state.isStarted && this.ball === undefined) {
             this.createBall();
             this.isNotMovingCounter = 0;
@@ -373,35 +397,57 @@ export class GameScene extends Phaser.Scene {
                 this.logBallVelocity(this.ball.body.velocity)
             }
         }
-        let isWin = this.state.roundState === RoundState.Win;
-        if (isWin || this.state.roundState === RoundState.Over) {
-            console.log(isWin ? "Level completed" : "Level failed")
+        if (this.state.roundState === RoundState.Over) {
+            console.log("Level failed")
             this.state.roundState = RoundState.Idle;
-            if(isWin) {
-                const score = 3;
-                this.renderer.snapshot((image) => {
+            this.reset(false);
+
+
+        }
+        if (this.state.roundState === RoundState.Win) {
+            console.log("Level completed")
+            this.state.roundState = RoundState.Snapshot;
+
+            this.state.winState = {
+                score: 3
+            }
+        }
+        if (this.state.roundState === RoundState.Snapshot || this.isPreview) {
+            this.hudGroup.setVisible(false);
+            debugger;
+            this.renderer.snapshot((image) => {
+                this.hudGroup.setVisible(true);
+                this.state.roundState = RoundState.Idle;
+                if(!this.isPreview) {
                     persistService.persistWin(this.state.levelInfo.key, {
-                        score,
+                        score: this.state.winState.score,
                         winImage: image
                     })
                     this.scene.start('levelRunFinish', {
                         isWin: true,
-                        score,
+                        score: this.state.winState.score,
                         levelKey: this.state.levelInfo.key,
                         winImage: image
                     })
-                });
-
-            } else {
-                this.reset(false);
-            }
+                } else {
+                    persistService.persistLevelPreview(this.state.levelInfo.key, image);
+                    if(this.destroyAfterSnapshot) {
+                        this.game.destroy(true, true);
+                    } else {
+                        this.scene.remove('game');
+                    }
+                    if(this.afterSnapshot) {
+                        this.afterSnapshot();
+                    }
+                }
+            });
         }
     }
 
     reset(all) {
         this.state.isStarted = false;
         this.state.roundState = RoundState.Setup;
-        if(this.ball) {
+        if (this.ball) {
             this.ball.destroy()
             this.ball = undefined;
         }
@@ -415,7 +461,7 @@ export class GameScene extends Phaser.Scene {
         this.addDamperButton.setVisible(true);
         this.removeBumperButton.setVisible(true);
 
-        if(!all)
+        if (!all)
             return
 
         this.bumperIntitialAngle = 0;
@@ -485,7 +531,10 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1, 0)
-            .setDepth(100)
+            .setDepth(200)
+
+        this.hudGroup.add(this.ballVelocityXInfo)
+
 
         this.ballVelocityYInfo = this.add
             .text(
@@ -499,7 +548,8 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1, 0)
-            .setDepth(100)
+            .setDepth(200)
+        this.hudGroup.add(this.ballVelocityYInfo)
 
         this.ballVelocityMaxInfo = this.add
             .text(
@@ -513,6 +563,9 @@ export class GameScene extends Phaser.Scene {
                 }
             )
             .setOrigin(1, 0)
-            .setDepth(100)
+            .setDepth(200)
+
+        this.hudGroup.add(this.ballVelocityMaxInfo)
+
     }
 }

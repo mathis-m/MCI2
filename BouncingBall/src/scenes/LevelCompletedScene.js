@@ -64,7 +64,7 @@ export class LevelRunFinishScene extends Phaser.Scene {
             .setOrigin(0.5, 0)
             .setInteractive()
             .on('pointerdown', () => {
-                this.scene.start('game', this.curLevel)
+                this.scene.start('game', {level: this.curLevel})
             });
         const nextOrOverview = this.add
             .text(
@@ -85,7 +85,7 @@ export class LevelRunFinishScene extends Phaser.Scene {
                 if (isLastLevel) {
                     this.scene.start('levelOverview')
                 } else {
-                    this.scene.start('game', this.nextLevel)
+                    this.scene.start('game', {level: this.nextLevel})
                 }
             });
 
@@ -111,7 +111,6 @@ export class LevelRunFinishScene extends Phaser.Scene {
         }
 
         if(this.isWin && this.winImage !== null) {
-
             const key = 'win_' + this.levelName + Date.now();
             this.textures.addImage(key, this.winImage);
             const image = this.add.sprite(midX, lastText.y + lastText.height + 50, key)

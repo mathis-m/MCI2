@@ -10,18 +10,25 @@ export class LevelOverviewScene extends Phaser.Scene {
 
     preload() {
         this.wins = persistService.getPersistedWins();
+        this.previews = persistService.getPersistedPreviews();
 
         for (const level of allLevels) {
             const win = this.wins.find(w => w.levelKey === level.key);
-            if(!win) continue;
-            const key = 'win_' + level.name;
+            const preview = this.previews.find(w => w.levelKey === level.key);
+            let imageBase64 = undefined;
+            if(win) {
+                imageBase64 = win.imageBase64;
+            } else if (preview) {
+                imageBase64 = preview.imageBase64;
+            }
+            const key = 'preview_' + level.name;
             if(this.textures.exists(key)) {
                 this.textures.removeKey(key);
             }
-            if(win.imageBase64 === undefined) {
+            if(imageBase64 === undefined) {
                 continue;
             }
-            this.textures.addBase64(key, win.imageBase64);
+            this.textures.addBase64(key, imageBase64);
         }
         this.load.scenePlugin({
             key: 'rexuiplugin',
@@ -91,11 +98,10 @@ export class LevelOverviewScene extends Phaser.Scene {
                 footer: 10,
             }
         }).layout()
-            .drawBounds(this.add.graphics(), 0xff0000)
             .setChildrenInteractive()
             .on('child.click', child => {
                 const level = allLevels.find(l => l.name === child.text);
-                this.scene.start('game', level)
+                this.scene.start('game', {level})
             })
     }
 
@@ -115,10 +121,11 @@ export class LevelOverviewScene extends Phaser.Scene {
 
         for (const level of allLevels) {
             const win = this.wins.find(w => w.levelKey === level.key);
+            const preview = this.previews.find(w => w.levelKey === level.key);
             let background;
             const height = WorldHeight / 3.5;
-            if(win) {
-                const key = 'win_' + level.name;
+            if(win || preview) {
+                const key = 'preview_' + level.name;
                 const image = this.add.sprite(0, 0, key)
                     .setOrigin(0.5, 0);
                 const scaleFactor = height / image.height;
