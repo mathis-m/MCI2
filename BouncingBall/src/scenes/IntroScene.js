@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import {WorldHeight, WorldWidth} from "../world";
+import {allLevels} from "../levels/allLevels";
 
 export class IntroScene extends Phaser.Scene {
 
@@ -40,6 +41,6 @@ export class IntroScene extends Phaser.Scene {
             )
             .setOrigin(0.5)
             .setInteractive()
-            .on('pointerdown', () => this.scene.start('game'));
+            .on('pointerdown', () => this.scene.start('game', allLevels[0]));
     }
 }
