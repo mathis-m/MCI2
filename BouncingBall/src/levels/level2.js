@@ -1,5 +1,5 @@
-import {BouncingBallLevel, InitialBallVelocity} from "./Level";
 import {WorldHeight, WorldWidth} from "../world";
+import {BouncingBallLevel, InitialBallVelocity} from "./BouncingBallLevel";
 
 const level2 = new BouncingBallLevel(
     {
@@ -24,7 +24,21 @@ const level2 = new BouncingBallLevel(
     {
         rimLocationX: WorldWidth * 0.8,
         rimLocationY: WorldHeight * 0.4,
-    }
+    },
+    [
+        {
+            x: WorldWidth * 0.25,
+            y: WorldHeight * 0.25
+        },
+        {
+            x: WorldWidth * 0.5,
+            y: WorldHeight * 0.5
+        },
+        {
+            x: WorldWidth * 0.75,
+            y: WorldHeight * 0.75
+        }
+    ]
 )
 
 export const level2Info = {

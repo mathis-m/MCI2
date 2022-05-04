@@ -1,5 +1,12 @@
-import {BouncingBallLevel, InitialBallVelocity} from "./Level";
 import {WorldHeight, WorldWidth} from "../world";
+import {BouncingBallLevel, InitialBallVelocity} from "./BouncingBallLevel";
+
+const wallHeight = WorldHeight / 2;
+const wallYMid = WorldHeight - (wallHeight / 2);
+const midX = WorldWidth / 2;
+
+const rimLocationX = WorldWidth * 0.8;
+const rimLocationY = WorldHeight * 0.8;
 
 const level1 = new BouncingBallLevel(
     {
@@ -8,19 +15,31 @@ const level1 = new BouncingBallLevel(
         initialBallVelocity: InitialBallVelocity.Low
     },
     (scene) => {
-        const height = WorldHeight / 2;
-        const midX = WorldWidth / 2;
-        const lowerY = WorldHeight - (height / 2);
-        const simpleWall = scene.add.rectangle(midX, lowerY, 148, height, 0xB86F2A);
+
+        const simpleWall = scene.add.rectangle(midX, wallYMid, 148, wallHeight, 0xB86F2A);
         return [
             scene.matter.add.gameObject(simpleWall)
                 .setStatic(true)
         ];
     },
     {
-        rimLocationX: WorldWidth * 0.8,
-        rimLocationY: WorldHeight * 0.8,
-    }
+        rimLocationX,
+        rimLocationY,
+    },
+    [
+        {
+            x: midX,
+            y: WorldHeight - wallHeight - 100
+        },
+        {
+            x: rimLocationX,
+            y: WorldHeight * 0.2
+        },
+        {
+            x: 150,
+            y: WorldHeight * 0.5
+        }
+    ]
 )
 
 export const level1Info = {

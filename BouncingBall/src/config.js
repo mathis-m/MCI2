@@ -4,13 +4,14 @@ import {WorldHeight, WorldWidth} from "./world";
 import {IntroScene} from "./scenes/IntroScene";
 import {LevelRunFinishScene} from "./scenes/LevelCompletedScene";
 import {LevelOverviewScene} from "./scenes/LevelOverviewScene";
+import {TutorialScene} from "./scenes/TutorialScene";
 console.log(`Running in '${!process.env.NODE_ENV ? 'production' : process.env.NODE_ENV}' mode`);
 
 let scene
 if (process.env.NODE_ENV === 'development') {
-    scene = [IntroScene, LevelOverviewScene, GameScene, LevelRunFinishScene];
+    scene = [IntroScene, TutorialScene, GameScene, LevelRunFinishScene, LevelOverviewScene];
 } else {
-    scene = [IntroScene, GameScene, LevelRunFinishScene, LevelOverviewScene];
+    scene = [IntroScene, TutorialScene, GameScene, LevelRunFinishScene, LevelOverviewScene];
 }
 export const config = {
     type: Phaser.CANVAS,
@@ -24,7 +25,6 @@ export const config = {
         height: WorldHeight,
     },
     scene: scene,
-    debug: false,
     physics: {
         default: 'matter',
         matter: {
@@ -61,4 +61,8 @@ export const snapshotConfig = {
             },
         }
     },
+    dom: {
+        createContainer: false
+    },
+    canvasStyle: "display: none"
 };

@@ -16,10 +16,10 @@ export class IntroScene extends Phaser.Scene {
         const midX = WorldWidth / 2;
         const midY = WorldHeight / 2;
 
-        this.add
+        const title = this.add
             .text(
                 midX,
-                WorldHeight * 0.25,
+                100,
                 'Bouncing Ball',
                 {
                     fontFamily: 'Monaco, Courier, monospace',
@@ -27,12 +27,12 @@ export class IntroScene extends Phaser.Scene {
                     fill: '#fff',
                 }
             )
-            .setOrigin(0.5);
+            .setOrigin(0.5, 0);
 
-        this.add
+        const start = this.add
             .text(
                 midX,
-                midY,
+                title.y + title.height + 50,
                 'Click here to start',
                 {
                     fontFamily: 'Monaco, Courier, monospace',
@@ -40,13 +40,74 @@ export class IntroScene extends Phaser.Scene {
                     fill: '#fff',
                 }
             )
-            .setOrigin(0.5)
+            .setOrigin(0.5, 0)
+            .setVisible(false)
             .setInteractive()
             .on('pointerdown', () => this.scene.start('levelOverview'))
-        debugger;
+
+
+        const tutorial = this.add
+            .text(
+                midX,
+                start.y + start.height + 50,
+                'Start the tutorial',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '20px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(0.5, 0)
+            .setVisible(false)
+            .setInteractive()
+            .on('pointerdown', () => this.scene.start('tutorial'))
+
+        const loading = this.add
+            .text(
+                midX,
+                tutorial.y + tutorial.height + 50,
+                'Loading...',
+                {
+                    fontFamily: 'Monaco, Courier, monospace',
+                    fontSize: '20px',
+                    fill: '#fff',
+                }
+            )
+            .setOrigin(0.5, 0)
+
+        const width = WorldWidth / 5;
+        const loadingContainer = this.add.graphics();
+        loadingContainer.lineStyle(3, 0xFFFFFF);
+        const y = loading.y + loading.height + 50;
+        loadingContainer.strokeRect(midX - (width / 2), y, width, 50)
+
+        const barWidth = ((width - 8) / allLevels.length ) - 4
+        let curX = (midX - (width / 2)) + 6
+        const levelLoadingBars = [];
+        for (let i = 0; i <  allLevels.length; i++) {
+            levelLoadingBars.push(
+                this.add.graphics()
+                    .fillStyle(0xFFFFFF)
+                    .fillRect(curX, y + 6, barWidth, 38)
+                    .setVisible(false)
+            )
+            curX += barWidth + 4
+        }
+
+
+
         const snapshotLevel = (i) => {
-            if(i === allLevels.length)
-                return;
+            if (i > 0) {
+                levelLoadingBars[i -1].setVisible(true)
+            }
+
+            if (i === allLevels.length) {
+                start.setVisible(true);
+                tutorial.setVisible(true);
+                loading.setText("Loaded");
+                this.snapshotGame.destroy(true, true);
+            }
+            console.log("snapshot " + i)
             this.snapshotGame.scene.start('game', {
                 level: allLevels[i], isPreview: true, destroyAfterSnapshot: i + 1 === allLevels.length,
                 afterSnapshot: () => snapshotLevel(i + 1)
