@@ -4,7 +4,7 @@ import {level3Info} from "./level3";
 import {level4Info} from "./level4";
 import {level5Info} from "./level5";
 
-export const debugLevel = level5Info;
+export const debugLevel = level1Info;
 
 export const getNextLevel = (currentKey) => {
     if(allLevels.length === currentKey + 1) {

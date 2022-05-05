@@ -10,9 +10,21 @@ export class IntroScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('backgroundMusic', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/backgroundMusic.ogg');
+        this.load.audio('click', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/click.ogg');
     }
 
     create() {
+        this.sound.add("backgroundMusic", {
+            loop: true,
+        })
+        this.sound.add("click", {
+            loop: true,
+            volume: 0.5
+        })
+        this.sound.play("backgroundMusic", {
+            volume: 0.5
+        })
         const midX = WorldWidth / 2;
         const midY = WorldHeight / 2;
 
@@ -43,7 +55,10 @@ export class IntroScene extends Phaser.Scene {
             .setOrigin(0.5, 0)
             .setVisible(false)
             .setInteractive()
-            .on('pointerdown', () => this.scene.start('levelOverview'))
+            .on('pointerdown', () => {
+                this.sound.play("click")
+                this.scene.start('levelOverview');
+            })
 
 
         const tutorial = this.add
@@ -60,7 +75,11 @@ export class IntroScene extends Phaser.Scene {
             .setOrigin(0.5, 0)
             .setVisible(false)
             .setInteractive()
-            .on('pointerdown', () => this.scene.start('tutorial'))
+            .on('pointerdown', () => {
+                this.sound.play("click")
+
+                return this.scene.start('tutorial');
+            })
 
         const loading = this.add
             .text(

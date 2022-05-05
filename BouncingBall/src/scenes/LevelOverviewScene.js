@@ -141,6 +141,7 @@ export class LevelOverviewScene extends Phaser.Scene {
 		}).layout()
 			.setChildrenInteractive()
 			.on('child.click', child => {
+				this.sound.play("click")
 				const level = allLevels.find(l => l.name === child.text.split(":")[0]);
 				this.scene.start('game', {level})
 			})

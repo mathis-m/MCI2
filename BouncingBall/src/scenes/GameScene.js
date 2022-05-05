@@ -77,15 +77,31 @@ export class GameScene extends Phaser.Scene {
 
 	preload() {
 		this.load.svg('drop-arrow', dropLocationArrow);
+		this.load.audio('collect', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/star-collect.ogg');
+		this.load.audio('bounce', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/bounce.ogg');
+		this.load.audio('levelCompleted', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/levelCompleted.ogg');
+		this.load.audio('loose', 'https://raw.githubusercontent.com/mathis-m/MCI2/main/BouncingBall/src/assets/loose.ogg');
 	}
 
-
 	create() {
+		this.sound.add("collect", {
+			loop: false,
+		})
+		this.sound.add("bounce", {
+			loop: false,
+		})
+		this.sound.add("levelCompleted", {
+			loop: false,
+		})
+		this.sound.add("loose", {
+			loop: false,
+		})
+
 		this.hudGroup = this.add.group();
 
 		this.matter.world.setBounds(0, 0, WorldWidth, WorldHeight);
 		this.createDropLocationMarker();
-        this.createStars();
+		this.createStars();
 		this.createActionGrid();
 		if (this.state.debug) {
 			this.createDebugInfo();
@@ -183,6 +199,9 @@ export class GameScene extends Phaser.Scene {
 		bumper.setStatic(true);
 		bumper.setAngle(this.bumperIntitialAngle);
 		bumper.setBounce(bounceFactor);
+		bumper.setOnCollide(() => {
+			this.sound.play("bounce");
+		})
 		this.bumperIntitialAngle += 15;
 		return bumper;
 	}
@@ -203,6 +222,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				if (!this.state.isStarted) {
 					this.state.roundState = RoundState.Execute;
 					this.state.isStarted = true;
@@ -230,6 +251,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				this.reset(true);
 			});
 		this.hudGroup.add(this.resetButton)
@@ -250,6 +273,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				this.scene.start("levelOverview");
 			});
 		this.hudGroup.add(this.overView)
@@ -269,6 +294,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				if (this.state.isStarted)
 					return;
 				this.bumperGroup.addBumper(this.setupNewBumper())
@@ -290,6 +317,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				if (this.state.isStarted)
 					return;
 				this.bumperGroup.addBumper(this.setupNewBumper(-1, 0xE7C800))
@@ -312,6 +341,8 @@ export class GameScene extends Phaser.Scene {
 			.setDepth(200)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				if (this.state.isStarted)
 					return;
 				if (this.state.selectedBumperIndex !== undefined)
@@ -359,16 +390,21 @@ export class GameScene extends Phaser.Scene {
 		this.starsToHitIndexArr = [];
 		let index = 0;
 
-        for (const starPos of starPositions) {
+		for (const starPos of starPositions) {
 			this.starsToHitIndexArr.push(index++);
-            const star = this.add.star(starPos.x, starPos.y, 5, 10, 15, 0xE7C12C)
-            this.stars.push(star);
-        }
+			const star = this.add.star(starPos.x, starPos.y, 5, 10, 15, 0xE7C12C)
+			this.stars.push(star);
+		}
 	}
 
 	createObstacles() {
 		this.obstacles = this.state.currentLevel.createObstaclesForScene(this);
-		this.obstacles.forEach(o => o.setBounce(1))
+		this.obstacles.forEach(o => {
+			o.setBounce(1);
+			o.setOnCollide(() => {
+				this.sound.play("bounce");
+			})
+		})
 	}
 
 	checkIfBallIsStillMoving() {
@@ -411,9 +447,10 @@ export class GameScene extends Phaser.Scene {
 				}
 			}
 			const isHit = this.matter.bounds.overlaps(starBounds, this.ball.body.bounds)
-			if(isHit) {
+			if (isHit) {
+				this.sound.play("collect");
 				const index = this.starsToHitIndexArr.indexOf(starIndex);
-				if(index > -1) {
+				if (index > -1) {
 					this.starsToHitIndexArr.splice(index, 1);
 				}
 				this.state.score += 1;
@@ -450,6 +487,8 @@ export class GameScene extends Phaser.Scene {
 		}
 		if (this.state.roundState === RoundState.Over) {
 			console.log("Level failed")
+			this.sound.play("loose")
+
 			this.state.roundState = RoundState.Idle;
 			this.reset(false);
 
@@ -458,7 +497,7 @@ export class GameScene extends Phaser.Scene {
 		if (this.state.roundState === RoundState.Win) {
 			console.log("Level completed")
 			this.state.roundState = RoundState.Snapshot;
-
+			this.sound.play("levelCompleted")
 			this.state.winState = {
 				score: this.state.score
 			}

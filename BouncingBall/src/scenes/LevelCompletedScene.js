@@ -64,6 +64,8 @@ export class LevelRunFinishScene extends Phaser.Scene {
 			.setOrigin(0.5, 0)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				this.scene.start('game', {level: this.curLevel})
 			});
 		const nextOrOverview = this.add
@@ -82,6 +84,8 @@ export class LevelRunFinishScene extends Phaser.Scene {
 			.setOrigin(0.5, 0)
 			.setInteractive()
 			.on('pointerdown', () => {
+				this.sound.play("click")
+
 				if (isLastLevel) {
 					this.scene.start('levelOverview')
 				} else {
@@ -106,6 +110,8 @@ export class LevelRunFinishScene extends Phaser.Scene {
 				.setOrigin(0.5, 0)
 				.setInteractive()
 				.on('pointerdown', () => {
+					this.sound.play("click")
+
 					this.scene.start('levelOverview')
 				});
 		}

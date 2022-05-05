@@ -174,7 +174,11 @@ export class TutorialScene extends Phaser.Scene {
 			)
 			.setOrigin(0.5, 1)
 			.setInteractive()
-			.on('pointerdown', () => this.scene.start('levelOverview'))
+			.on('pointerdown', () => {
+				this.sound.play("click")
+
+				return this.scene.start('levelOverview');
+			})
 	}
 
 	createRim(x, y) {
